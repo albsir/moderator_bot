@@ -6,6 +6,7 @@ from handlers import client, admin
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
+
 async def on_startup(_):
     print('Бот вкл  '+str(datetime.datetime.now()))
     scheduler.start()
