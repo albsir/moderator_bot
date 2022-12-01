@@ -1,0 +1,20 @@
+{
+  "Отправка правил чата": "send_rules_chat",
+  "Проверка на админа пройдена": "check_right_admin",
+  "Первая пройденная регистрация": "check_first_reg",
+  "Повторная пройденная проверка": "check_again",
+  "Возвращение в чат": "return_in_chat",
+  "Вернулся в чат, но не прошел проверку": "return_in_chat_but_not_checked",
+  "Приветствие новому пользователю": "new_member_welcome",
+  "Сообщение, если заблокирован": "banned_user_in_chat",
+  "Не подписан на другие чаты": "user_not_sub_channel",
+  "Спам": "user_is_spam",
+  "Написал запрет слово 1 часть": "user_use_ban_word_begin",
+  "Написал запрет слово 2 часть": "user_use_ban_word_end",
+  "Отправил запрет хештег 1 часть": "user_use_ban_hashtag_without_photo_begin",
+  "Отправил запрет хештег 2 часть": "user_use_ban_hashtag_without_photo_end",
+  "Отправил фото без хештега": "user_not_use_hashtag_with_photo",
+  "Отправил запрет хештег с фото 1 часть": "user_use_ban_hashtag_with_photo_begin",
+  "Отправил запрет хештег с фото 2 часть": "user_use_ban_hashtag_with_photo_end",
+  "Отправил запрещенную ссылку": "user_use_not_allowed_link"
+}
