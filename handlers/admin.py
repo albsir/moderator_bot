@@ -132,7 +132,7 @@ async def cansel_handler_message(message: types.Message, state: FSMContext):
 
 async def default_message_handler(message: types.Message, state: FSMContext):
     pass
-    
+
 """
 
 

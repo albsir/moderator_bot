@@ -6,9 +6,8 @@ from handlers import client, admin
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
-
 async def on_startup(_):
-    print('Бот вкл  '+str(datetime.datetime.now()))
+    print('Бот вкл  ' + str(datetime.datetime.now()))
     scheduler.start()
     client.scheduler = scheduler
     try:
@@ -16,6 +15,7 @@ async def on_startup(_):
     except:
         scheduler.remove_all_jobs()
         scheduler.add_job(client.delete_last_message_end, "interval", minutes=1, id='del_mes')
+
 
 scheduler = AsyncIOScheduler()
 admin.register_handlers_client(dp)
