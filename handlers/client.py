@@ -618,6 +618,11 @@ async def user_unsub_delete_messages_from_chats(message: types.Message):
     name_folders = os.listdir(path_for_people_chats)
     for i in range(len(name_folders)):
         chat_id = name_folders[i]
+        user_channel_status = await bot.get_chat_member(chat_id=int(chat_id), user_id=message.from_user.id)
+        if user_channel_status["status"] != 'left':
+            await bot.send_message(int(chat_id), await check_have_username(message) +
+                                   'Вы отписались от одного из наших каналов, '
+                                   'ваши сообщения за последние 3 дня удалены.')
         path_for_human_chats_option = path_for_people_chats + str(chat_id) + "/" + str(
             message.from_user.id) + ".json"
         try:
@@ -636,7 +641,7 @@ async def user_unsub_delete_messages_from_chats(message: types.Message):
                     option_this_human["messages_allowed_time"][j], check_time_format)
             delta_time = datetime.datetime.now() - time_in_option
             if delta_time.days < 4:
-                await bot.delete_message(chat_id, option_this_human["messages_allowed_id"][j])
+                await bot.delete_message(int(chat_id), option_this_human["messages_allowed_id"][j])
         option_this_human["messages_allowed_id"] = []
         option_this_human["messages_allowed_time"] = []
         with open(path_for_human_chats_option, 'w', encoding='cp1251') as file:
