@@ -80,7 +80,7 @@ async def delete_last_message_end():
         messages_deleting_bot = new_array
         with open(path_deleting_messages, 'w', encoding='cp1251') as file:
             json.dump(messages_deleting_bot, file, ensure_ascii=False)
-    #scheduler.remove_job('del_mes')
+    # scheduler.remove_job('del_mes')
 
 
 async def create_new_member_file(message: types.Message):
@@ -93,7 +93,7 @@ async def create_new_member_file(message: types.Message):
     time_str = str(datetime.datetime.now() - datetime.timedelta(days=1))
     option_this_human = {"admin": False, "check_human": False, "Warning": 0, "Ban": False,
                          "Time_to_ban_in_minutes": 0,
-                         "last_sms_data": time_str}
+                         "last_sms_data": time_str, "messages_allowed_id": [], "messages_allowed_time": []}
     if await admin.check_user_for_admin(str(message.from_user.username), str(message.chat.id)):
         option_this_human["admin"] = True
         option_this_human["check_human"] = True
@@ -602,6 +602,47 @@ async def accept_verification(callback: types.CallbackQuery):
     await callback.answer()
 
 
+async def add_allow_message_in_list_messages_user(message: types.Message):
+    path_for_human_chats_option = path_for_people_chats + str(message.chat.id) + "/" + str(
+        message.from_user.id) + ".json"
+    with open(path_for_human_chats_option, "r", encoding='cp1251') as file:
+        option_this_human = json.load(file)
+    option_this_human["messages_allowed_id"].append(message.message_id)
+    option_this_human["messages_allowed_time"].append(str(datetime.datetime.now()))
+    with open(path_for_human_chats_option, 'w', encoding='cp1251') as file:
+        json.dump(option_this_human, file, ensure_ascii=False)
+
+
+async def user_unsub_delete_messages_from_chats(message: types.Message):
+    global path_for_people_chats
+    name_folders = os.listdir(path_for_people_chats)
+    for i in range(len(name_folders)):
+        chat_id = name_folders[i]
+        path_for_human_chats_option = path_for_people_chats + str(chat_id) + "/" + str(
+            message.from_user.id) + ".json"
+        try:
+            with open(path_for_human_chats_option, "r", encoding='cp1251') as file:
+                option_this_human = json.load(file)
+        except FileNotFoundError:
+            continue
+        for j in option_this_human["messages_allowed_id"]:
+            try:
+                check_time_format = "%Y-%m-%dT%H:%M:%S.%f"
+                time_in_option = datetime.datetime.strptime(
+                    option_this_human["messages_allowed_time"][j], check_time_format)
+            except ValueError:
+                check_time_format = "%Y-%m-%dT%H:%M:%S"
+                time_in_option = datetime.datetime.strptime(
+                    option_this_human["messages_allowed_time"][j], check_time_format)
+            delta_time = datetime.datetime.now() - time_in_option
+            if delta_time.days < 4:
+                await bot.delete_message(chat_id, option_this_human["messages_allowed_id"][j])
+        option_this_human["messages_allowed_id"] = []
+        option_this_human["messages_allowed_time"] = []
+        with open(path_for_human_chats_option, 'w', encoding='cp1251') as file:
+            json.dump(option_this_human, file, ensure_ascii=False)
+
+
 async def delete_word_in_chat(message: types.Message):
     """
     if not await check_verification(message, False):
@@ -631,6 +672,7 @@ async def delete_word_in_chat(message: types.Message):
     else:
         await update_last_sms_human(message)
         await check_count_warning(message, False)
+        await add_allow_message_in_list_messages_user(message)
 
 
 def register_handlers_client(dp: Dispatcher):
@@ -645,6 +687,8 @@ def register_handlers_client(dp: Dispatcher):
                                 commands="reg", state=None)
 
     dp.register_message_handler(handler_new_member, content_types=types.ContentType.NEW_CHAT_MEMBERS)
+
+    dp.register_message_handler(user_unsub_delete_messages_from_chats, content_types=types.ContentType.LEFT_CHAT_MEMBER)
 
     dp.register_message_handler(delete_word_in_chat,
                                 chat_type=[types.ChatType.GROUP, types.ChatType.SUPERGROUP],
